@@ -6,9 +6,11 @@ using namespace std;
 
 class blockchain {
 public:
-    blockchain();
+    blockchain(uint32_t diff);
 
     void addBlock(block b_new);
+
+    uint32_t display_diff;
 
 private:
     uint32_t _n_difficulty;
