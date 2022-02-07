@@ -6,7 +6,7 @@
 using namespace std;
 
 int main() {
-    blockchain test_chain = blockchain(5); // create blockchain with hash difficulty 3
+    blockchain test_chain = blockchain(4); // create blockchain with hash difficulty 3
 
     cout << "\nCryptographic algorithm used: SHA-256" << endl;
     cout << "n_difficulty is set to " << test_chain.display_diff << "; higher numbers take longer to hash" << endl;
