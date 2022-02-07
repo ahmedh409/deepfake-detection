@@ -19,7 +19,7 @@ void blockchain::addBlock(block b_new) {
 void blockchain::display(void) {
     std::cout << std::endl;
     for (int i = 0; i < _v_chain.size(); i++)
-        std::cout << "[ BLOCK " << i << ": \"" << _v_chain[i].data << "\" ]--->";
+        std::cout << "[ B-" << i << ": \"" << _v_chain[i].data << "\" ]--->";
     std::cout << std::endl;
 }
 
