@@ -1,6 +1,5 @@
 // comm.h
-// a library of communication functionality
-
+// Comm: a project library developed for communication functionality
 #include <string>
 
 void send(std::string message);
