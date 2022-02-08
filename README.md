@@ -8,7 +8,7 @@
 - adjusted CLI output
 Made client more user-friendly.
 
-##### February 6th, 2022
+#### February 6th, 2022
 - created `blockchain.h` and `blockchain.cpp` for data structure
 - created `block.h` and `block.cpp` for block objects
 - `main.cpp` creates 1 genesis block and 3 extra blocks for testing purposes
