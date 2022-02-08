@@ -6,6 +6,7 @@
 - created `blockchain::display(void)` function to output the blockchain (visually) to CLI
 - added more/cleaned comments
 - adjusted CLI output
+
 Made client more user-friendly.
 
 #### February 6th, 2022
