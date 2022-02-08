@@ -15,4 +15,5 @@ Made client more user-friendly.
 - created dummy `node` class
 - created `comm` files 
 - created Makefile for outputting `a.out`, with `make clean` command to delete `a.out`
+
 Project currently uses SHA-256 algorithm for hashing during block mining (found online: http://www.zedwood.com/article/cpp-sha256-function). Current TestChain is proof-of-work (PoW), not sure how to make it proof-of-stake (PoS), or if even necessary. Current TestChain is only able to handle strings as block data, will need to upgrade this to other forms of media (specifically videos). "Nodes" will eventually be the primary actors in the network, acting as individual computers on the network. Comm library will abstract away all communication details. Need to change namespace as this can cause problems for larger projects - basically delete `using namespace std`.
