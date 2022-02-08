@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "node.h"
 
 // Tutorial used: https://davenash.com/2017/10/build-a-blockchain-with-c/n
 
@@ -31,6 +32,12 @@ int main() {
     test_chain.display();
 
     std::cout << std::endl;
+
+    // test nodes
+    Node n0(0);
+    Node n1(1);
+    std::cout << n0.node_list[0] << std::endl;
+    std::cout << n0.node_list[1] << std::endl;
 
     return 0;
 }

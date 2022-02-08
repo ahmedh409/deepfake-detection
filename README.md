@@ -1,5 +1,9 @@
 # Deepfake Detection
 
+#### February 8th, 2022
+- there is now a global list of nodes so nodes are aware of all others
+- installed lightweight unit testing framework (open source on github)
+
 #### February 7th, 2022
 - removed `using namespace std` from all files, added `std::` prefixes
 - `main.cpp` can now handle variable numbers of blocks, each with their own unique string data
