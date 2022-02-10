@@ -1,5 +1,8 @@
 # Deepfake Detection
 
+#### February 9th, 2022
+- added a framework for a full system test, can't actually test anything until image hashing is ready
+
 #### February 8th, 2022
 - there is now a global list of nodes so nodes are aware of all others
 - installed lightweight unit testing framework (open source on github)
