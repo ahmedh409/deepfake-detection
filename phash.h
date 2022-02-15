@@ -15,14 +15,12 @@ uint8_t* reduce_size(uint8_t* rgb_image);
 
 uint8_t* grayscale(uint8_t* small_rgb_image);
 
-uint8_t* DCT_computation(uint8_t* grayscale_image*);
+uint8_t* DCT_computation(uint8_t* grayscale_image);
 
-uint8_t* reduce_DCT(uint8_t* DCT_image);
+std::vector<int> reduce_DCT(uint8_t* DCT_image);
 
-uint8_t* average_value(uint8_t* reduced_DCT);
+std::vector<int> discretize(std::vector<int> reduced_DCT);
 
-uint8_t* discretize(uint8_t* averaged_DCT);
+std::string construct_hash(std::vector<int> discretized_DCT_bits);
 
-string construct_hash(uint8_t* discretized_DCT);
-
-string generate_phash(uint8_t* input);
+std::string generate_phash(uint8_t* rgb_image);
