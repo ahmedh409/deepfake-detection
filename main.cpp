@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "node.h"
+#include <phash.h>
 
 // Tutorial used: https://davenash.com/2017/10/build-a-blockchain-with-c/n
 
