@@ -10,6 +10,7 @@
 // to read images: https://stackoverflow.com/questions/2076475/reading-an-image-file-in-c-c
 // NOTE: pseudocode from http://hackerfactor.com/blog/index.php%3F/archives/432-Looks-Like-It.html
 
+uint8_t* read_image(std::string file_name);
 
 uint8_t* reduce_size(uint8_t* rgb_image);
 

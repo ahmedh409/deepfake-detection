@@ -3,20 +3,43 @@
 #include "phash.h"
 #include <string>
 #include <vector>
+#include <iostream>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include "stb_image_resize.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 
 // NOTE: psuedocode from http://hackerfactor.com/blog/index.php%3F/archives/432-Looks-Like-It.html 
 
+// global temporarily
+int width, height, bpp;
+// reads the image from the file system in RGB format
+uint8_t* read_image(std::string file_name) {
+    uint8_t* full_image = stbi_load(file_name.c_str(), &width, &height, &bpp, 3);
+    return full_image;
+}
 
 uint8_t* reduce_size(uint8_t* rgb_image) {
-    // reduce image dimensions to 32x32
-    uint8_t* small_rgb_image;
+    // reduce image dimensions to 8x8
+    uint8_t* small_rgb_image = (uint8_t *) malloc(8 * 8 * 3);
+    stbir_resize_uint8(rgb_image, width, height, 0,
+                        small_rgb_image, 8, 8, 0, 3);
+    
+    stbi_write_png("./temp/out.png", 8, 8, 3, small_rgb_image, 8*3);
     return small_rgb_image;
 }
 
 uint8_t* grayscale(uint8_t* small_rgb_image) {
-    // transform 32x32 image from RGB to grayscale
-    uint8_t* grayscale_image;
+    // transform 8x8 image from RGB to grayscale
+    int w, h, b;
+    uint8_t* grayscale_image = stbi_load("./temp/out.png",
+                                    &w, &h, &b, 1);
+
+    stbi_write_png("./temp/out2.png", w, h, 1, grayscale_image, w);
     return grayscale_image;
 }
 
@@ -40,19 +63,61 @@ std::vector<int> discretize(std::vector<int> reduced_DCT) {
     return discretized_DCT_bits;
 }
 
-std::string construct_hash(std::vector<int> discretized_DCT_bits) {
+std::string construct_hash(std::vector<int> bits) {
     // input is vector<int> (length 64) of 0s and 1s
     // take each set of 4 and convert into hexadecimal
     // concatenate each hex value (should have 16) and return as a string
-    std::string hash;
+    std::string hash = "";
+
+    for (int i = 0; i < 64; i+=4) {
+        int hex_digit = (8 * bits[i]) + (4 * bits[i+1]) + (2 * bits[i+2]) + bits[i+3];
+        if (hex_digit < 10) {
+            hash += std::to_string(hex_digit);
+        } else {
+            hash += ('a' + hex_digit - 10);
+        }
+    }
+
     return hash;
 }
 
-std::string generate_phash(uint8_t* rgb_image) {
-    // main helper function - input image, output hash
+std::string generate_phash(std::string file_name) {
+    // main helper function - input image file name, output hash
+    uint8_t* full_image = read_image(file_name);
+    uint8_t* small_rgb_image = reduce_size(full_image);
+    uint8_t* grayscale_image = grayscale(small_rgb_image);
+
+    // convert to vector
+    std::vector<int> pixels_gray;
+    int sum = 0;
+    for (int i = 0; i < 64; i++) {
+        pixels_gray.push_back(grayscale_image[i]);
+        sum += grayscale_image[i];
+    }
+    int average = sum / 64;
+    // construct the 0s and 1s list
+    std::vector<int> bits;
+    for (int i = 0; i < 64; i++) {
+        bits.push_back(pixels_gray[i] > average);
+    }
+    
+    std::string hash = construct_hash(bits);
+    
+    /*
     uint8_t* grayscale_image = grayscale(reduce_size(rgb_image));
     std::vector<int> reduced_DCT = reduce_DCT(DCT_computation(grayscale_image));
     std::vector<int> discretized_DCT_bits = discretize(reduced_DCT);
-    std::string hash = construct_hash(discretized_DCT_bits);
+    */
     return hash;
+}
+
+
+// just for testing purposes
+int main() {
+    std::cout << "Enter a file name: ";
+    std::string file_name;
+    std::cin >> file_name;
+    std::cout << file_name << std::endl;
+
+    std::cout << generate_phash(file_name) << std::endl;
 }

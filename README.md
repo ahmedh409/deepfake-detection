@@ -1,5 +1,12 @@
 # Deepfake Detection
 
+#### February 21st, 2022
+- finished the first version of perceptual image hashing (rough)
+
+#### February 14th, 2022
+- set up framework for image hashing, still needs to be implemented
+- chose an image IO library
+
 #### February 9th, 2022
 - added a framework for a full system test, can't actually test anything until image hashing is ready
 
