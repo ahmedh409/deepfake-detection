@@ -1,4 +1,5 @@
 #include "blockchain.h"
+#include "phash.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -15,17 +16,19 @@ int main() {
 
     std::cout << "How many blocks would you like to add to the TestChain? ";
     int num_blocks; std::cin >> num_blocks;
-    std::string data[num_blocks];
+    std::string paths[num_blocks];
+    std::string hashes[num_blocks];
     for (int i = 0; i < num_blocks; i++) {
-        std::cout << "   Enter data contained in block " << i+1 << ": ";
-        std::cin >> data[i];
+        std::cout << "   Enter name of image for block " << i+1 << ": ";
+        std::cin >> paths[i];
     }
 
     std::cout << "\n===== TESTCHAIN =====" << std::endl;
 
     for (int i = 0; i < num_blocks; i++) {
         std::cout << "MINING BLOCK " << i+1 << " -> ";
-        test_chain.addBlock(block(i+1, data[i]));
+
+        test_chain.addBlock(block(i+1, generate_phash(paths[i])));
     }
 
     std::cout << std::endl;
@@ -35,10 +38,12 @@ int main() {
     std::cout << std::endl;
 
     // test nodes
+    /*
     Node n0(0);
     Node n1(1);
     std::cout << n0.node_list[0] << std::endl;
     std::cout << n0.node_list[1] << std::endl;
+    */
 
     return 0;
 }

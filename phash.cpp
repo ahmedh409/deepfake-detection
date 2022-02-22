@@ -17,14 +17,15 @@
 
 // global temporarily
 int width, height, bpp;
+
 // reads the image from the file system in RGB format
 uint8_t* read_image(std::string file_name) {
     uint8_t* full_image = stbi_load(file_name.c_str(), &width, &height, &bpp, 3);
     return full_image;
 }
 
+// reduce image dimensions to something specified
 uint8_t* reduce_size(uint8_t* rgb_image) {
-    // reduce image dimensions to 8x8
     uint8_t* small_rgb_image = (uint8_t *) malloc(8 * 8 * 3);
     stbir_resize_uint8(rgb_image, width, height, 0,
                         small_rgb_image, 8, 8, 0, 3);
@@ -33,8 +34,8 @@ uint8_t* reduce_size(uint8_t* rgb_image) {
     return small_rgb_image;
 }
 
+// transform smaller image from RGB to grayscale
 uint8_t* grayscale(uint8_t* small_rgb_image) {
-    // transform 8x8 image from RGB to grayscale
     int w, h, b;
     uint8_t* grayscale_image = stbi_load("./temp/out.png",
                                     &w, &h, &b, 1);
@@ -43,12 +44,14 @@ uint8_t* grayscale(uint8_t* small_rgb_image) {
     return grayscale_image;
 }
 
+// currently not in use - 2/22/22
 uint8_t* DCT_computation(uint8_t* grayscale_image) {
     // perform Discrete Cosine Transform (DCT) on grayscale image
     uint8_t* DCT_image;
     return DCT_image;
 }
 
+// currently not in use - 2/22/22
 std::vector<int> reduce_DCT(uint8_t* DCT_image) {
     // The DCT is 32x32, just keep the top-left 8x8 - those represent the lowest frequencies in the picture
     // return this 8x8 image as a vector<int> length 64 (attach each "row" of integer values on the end of the prev row)
@@ -56,6 +59,7 @@ std::vector<int> reduce_DCT(uint8_t* DCT_image) {
     return reduced_DCT;
 }
 
+// currently not in use - 2/22/22
 std::vector<int> discretize(std::vector<int> reduced_DCT) {
     // compute the mean DCT value of reduced_DCT, but excluding the first term (which would throw off the average)
     // set the 64 hash bits from reduced_DCT to a 0 or a 1 based on the calculated threshold average value
@@ -63,10 +67,10 @@ std::vector<int> discretize(std::vector<int> reduced_DCT) {
     return discretized_DCT_bits;
 }
 
+// input is vector<int> (length 64) of 0s and 1s
+// take each set of 4 and convert into hexadecimal
+// concatenate each hex value (should have 16) and return as a string
 std::string construct_hash(std::vector<int> bits) {
-    // input is vector<int> (length 64) of 0s and 1s
-    // take each set of 4 and convert into hexadecimal
-    // concatenate each hex value (should have 16) and return as a string
     std::string hash = "";
 
     for (int i = 0; i < 64; i+=4) {
@@ -78,15 +82,21 @@ std::string construct_hash(std::vector<int> bits) {
         }
     }
 
+    std::cout << "DONE" << std::endl;
     return hash;
 }
 
+// main helper function - input image file name, output hash
 std::string generate_phash(std::string file_name) {
-    // main helper function - input image file name, output hash
+    // DCT and discretization not used
+
+    std::cout << "Starting hash...";
+
     uint8_t* full_image = read_image(file_name);
     uint8_t* small_rgb_image = reduce_size(full_image);
     uint8_t* grayscale_image = grayscale(small_rgb_image);
 
+    std::cout << "matrix to vector...";
     // convert to vector
     std::vector<int> pixels_gray;
     int sum = 0;
@@ -94,25 +104,28 @@ std::string generate_phash(std::string file_name) {
         pixels_gray.push_back(grayscale_image[i]);
         sum += grayscale_image[i];
     }
+
+    std::cout << "discretizing...";
     int average = sum / 64;
-    // construct the 0s and 1s list
+    // if pixel value above threshold (average), then 1, else 0
     std::vector<int> bits;
     for (int i = 0; i < 64; i++) {
         bits.push_back(pixels_gray[i] > average);
     }
     
-    std::string hash = construct_hash(bits);
-    
     /*
+    use later (not currently implemented)
     uint8_t* grayscale_image = grayscale(reduce_size(rgb_image));
     std::vector<int> reduced_DCT = reduce_DCT(DCT_computation(grayscale_image));
     std::vector<int> discretized_DCT_bits = discretize(reduced_DCT);
     */
-    return hash;
+
+    std::cout << "hex conversion...";
+    return construct_hash(bits);;
 }
 
-
-// just for testing purposes
+// testing
+/*
 int main() {
     std::cout << "Enter a file name: ";
     std::string file_name;
@@ -121,3 +134,4 @@ int main() {
 
     std::cout << generate_phash(file_name) << std::endl;
 }
+*/

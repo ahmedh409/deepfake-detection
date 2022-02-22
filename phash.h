@@ -24,4 +24,4 @@ std::vector<int> discretize(std::vector<int> reduced_DCT);
 
 std::string construct_hash(std::vector<int> discretized_DCT_bits);
 
-std::string generate_phash(uint8_t* rgb_image);
+std::string generate_phash(std::string file_name);
