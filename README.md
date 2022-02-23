@@ -1,18 +1,31 @@
 # Deepfake Detection
 
+#### February 22nd, 2022
+- perceptual image hashing finished, needs debugging
+- removed `main.cpp`, `tests/interactive_system_test.cpp` is now used as file for testing
+- integrated image hashing with other functions
+- updated Makefile
+- refactored code
+- restructured files and folders
+- added `doge.jpeg`, `mars.jpeg`, and `color.jpeg` for testing
+- added `num_blocks` field for blockchain object
+- adjusted CLI output
+
+Almost completed v0.1! Light debugging of hashing necessary before done.
+
 #### February 21st, 2022
 - finished the first version of perceptual image hashing (rough)
 
 #### February 14th, 2022
-- set up framework for image hashing, still needs to be implemented
-- chose an image IO library
+- added pseudocode framework for image hashing, still needs to be implemented
+- chose an image I/O library
 
 #### February 9th, 2022
 - added a framework for a full system test, can't actually test anything until image hashing is ready
 
 #### February 8th, 2022
-- there is now a global list of nodes so nodes are aware of all others
-- installed lightweight unit testing framework (open source on github)
+- added a global list of nodes so nodes are aware of all others
+- installed lightweight unit testing framework (open source on Github)
 
 #### February 7th, 2022
 - removed `using namespace std` from all files, added `std::` prefixes
