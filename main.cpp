@@ -1,15 +1,15 @@
-#include "blockchain.h"
-#include "phash.h"
+#include "./blockchain/blockchain.h"
+#include "./hashing/phash.h"
+#include "./simulation/node.h"
+#include "./hashing/phash.h"
 #include <iostream>
 #include <string>
 #include <vector>
-#include "node.h"
-#include "phash.h"
 
 // Tutorial used: https://davenash.com/2017/10/build-a-blockchain-with-c/n
 
 int main() {
-    blockchain test_chain = blockchain(5); // create blockchain with hash difficulty as parameter
+    blockchain test_chain = blockchain(2); // create blockchain with hash difficulty as parameter
 
     std::cout << "\nCryptographic algorithm used: SHA-256\nn_difficulty is set to " << test_chain.display_diff << "; higher numbers take longer to hash"
     "\nMost of this is from a tutorial online, link commented in main.cpp\n" << std::endl;
@@ -26,7 +26,7 @@ int main() {
     std::cout << "\n===== TESTCHAIN =====" << std::endl;
 
     for (int i = 0; i < num_blocks; i++) {
-        std::cout << "MINING BLOCK " << i+1 << " -> ";
+        std::cout << "HASHING MEDIA " << i+1 << " -> ";
 
         test_chain.addBlock(block(i+1, generate_phash(paths[i])));
     }
