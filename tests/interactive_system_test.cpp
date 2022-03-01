@@ -42,8 +42,20 @@ bool add_hash_to_chain(void) {
     return true;
 }
 
-bool search_chain(void) {
-    std::cout << "Not implemented." << std::endl;
+bool search_for_image(void) {
+    std::cout << "Enter an image path" << std::endl;
+    std::cout << "> ";
+
+    std::string file_path;
+    std::cin >> file_path;
+    std::string hash = generate_phash(file_path);
+    block b = test_chain.search_chain(hash);
+    if (b.data == hash) {
+        std::cout << "Found in block " << b.n_index << "!" << std::endl;
+    } else {
+        std::cout << "Not found in chain." << std::endl;
+    }
+
     return true;
 }
 
@@ -87,7 +99,7 @@ int main() {
                 sleep(1);
                 break;
             case 3:
-                search_chain();
+                search_for_image();
                 sleep(1);
                 break;
             case 4:

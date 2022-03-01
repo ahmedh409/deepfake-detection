@@ -2,7 +2,7 @@
 #include "block.h"
 #include "sha256.h"
 
-block::block(uint32_t n_index_in, const std::string &s_data_in) : _n_index(n_index_in), _s_data(s_data_in) {
+block::block(uint32_t n_index_in, const std::string &s_data_in) : n_index(n_index_in), _s_data(s_data_in) {
     _n_nonce = -1;
     _t_time = time(nullptr);
     data = _s_data;
@@ -35,7 +35,7 @@ void block::mineBlock(uint32_t n_difficulty) {
 inline std::string block::_calculateHash() const {
     // stringstreams are useful for interfacing various types with strings - works like iostream
     std::stringstream ss;
-    ss << _n_index << _t_time << _s_data << _n_nonce << s_prev_hash;
+    ss << n_index << _t_time << _s_data << _n_nonce << s_prev_hash;
 
     return sha256(ss.str());;
 }

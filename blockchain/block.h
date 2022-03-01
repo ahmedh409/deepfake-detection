@@ -15,8 +15,9 @@ public:
 
     std::string data;
 
+    uint32_t n_index;
+
 private:
-    uint32_t _n_index;
     int64_t _n_nonce;
     std::string _s_data;
     std::string _s_hash;

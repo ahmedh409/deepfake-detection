@@ -10,6 +10,8 @@ public:
 
     void display(void);
 
+    block search_chain(std::string hash);
+
     // n_difficulty is a private variable for security reasons, display_diff is a public dummy variable used for output
     uint32_t display_diff;
 

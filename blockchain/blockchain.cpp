@@ -19,11 +19,19 @@ void blockchain::addBlock(block b_new) {
 }
 
 void blockchain::display(void) {
-    std::cout << "Cryptographic algorithm used: SHA-256\nn_difficulty is set to " << display_diff << "; higher numbers take longer to hash"
-    "\nMost of this is from a tutorial online, link commented in main.cpp\n" << std::endl;
+    std::cout << "Cryptographic algorithm used: SHA-256\nn_difficulty is set to " << display_diff << "; higher numbers take longer to hash\nMost of this is from a tutorial online, link commented in main.cpp\n" << std::endl;
+
     for (int i = 0; i < _v_chain.size(); i++)
         std::cout << "[ B-" << i << ": \"" << _v_chain[i].data << "\" ]--->";
     std::cout << std::endl;
+}
+
+block blockchain::search_chain(std::string hash) {
+    for (int i = 1; i < _v_chain.size(); i++) {
+        if (_v_chain[i].data == hash)
+            return _v_chain[i];
+    }
+    return _v_chain[0];
 }
 
 block blockchain::_getLastBlock() const {
