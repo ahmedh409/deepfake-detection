@@ -3,7 +3,7 @@
 // FILE INCLUDES
 #include "./../blockchain/blockchain.h"
 #include "./../hashing/phash.h"
-#include "./../simulation/node.h"
+#include "./../node/node.h"
 #include "./../hashing/phash.h"
 // LIBRARY INCLUDES
 #include <iostream>

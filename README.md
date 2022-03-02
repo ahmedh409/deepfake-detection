@@ -1,5 +1,13 @@
 # Deepfake Detection
 
+#### March 1st, 2022
+- modified `interactivesystemtest.cpp` to include searching the chain
+- updated the Makefile to build multiple targets
+- we can now run nodes as their own programs
+- added a simulation which creates many node processes
+
+Finished with v0.1! Beginning work on v0.2.
+
 #### February 22nd, 2022
 - perceptual image hashing finished, needs debugging
 - removed `main.cpp`, `tests/interactive_system_test.cpp` is now used as file for testing

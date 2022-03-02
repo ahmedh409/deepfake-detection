@@ -13,6 +13,8 @@ private:
     // form of identification
     uint32_t _id;
 
+    void loop();
+
     // need to implement some sort of digital signature scheme
     // here
 };
