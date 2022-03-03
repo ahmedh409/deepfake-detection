@@ -2,12 +2,17 @@
 #include <cstdint>
 #include <vector>
 
+struct NodeInfo {
+    int id;
+    int port;
+};
+
 class Node {
 public:
     
     Node(uint32_t id);
 
-    static std::vector<uint32_t> node_list;
+    std::vector<struct NodeInfo*> node_list;
 
 private:
     // form of identification

@@ -21,5 +21,6 @@ run :
 	./a.out
 
 clean :
-	rm -r -f *a.out temp/*
+	rm -r -f *.out temp/*
 	find . -type f -name '*.o' -delete
+	mkdir temp/node_list
