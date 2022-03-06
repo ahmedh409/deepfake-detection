@@ -1,5 +1,11 @@
 # Deepfake Detection
 
+#### March 6th, 2022
+- global node list part 2 (finished), all nodes can read from the folder
+
+#### March 2nd, 2022
+- global node list part 1, all nodes publish a file to a folder
+
 #### March 1st, 2022
 - modified `interactivesystemtest.cpp` to include searching the chain
 - updated the Makefile to build multiple targets
