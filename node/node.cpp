@@ -16,22 +16,57 @@ Node::Node(uint32_t id) {
     */
     // create a new node in the contact list
     struct NodeInfo mynode = {(int) this->_id, (int) this->_id};
-    this->node_list.push_back(&mynode);
 
-    // create the public file and write to it
-    std::ofstream myfile;
-    std::string filename = "./temp/node_list/" + std::to_string(this->_id) + ".txt";
-    myfile.open(filename, std::fstream::out | std::fstream::trunc);
-    myfile << this->_id << " " << this->_id << " finished";
-    myfile.close();
+    try {
+        // create the public file and write to it
+        std::ofstream myfile;
+        std::string filename = "./temp/node_list/" + std::to_string(this->_id) + ".txt";
+        myfile.open(filename, std::fstream::out | std::fstream::trunc);
+        myfile << this->_id << " " << this->_id << " finished";
+        myfile.close();
+    } catch (...) {
+        exit(1);
+    }
 
     this->loop();
 }
 
 void Node::loop() {
-    for (int i = 0; i < 1; i++) {
+    // highest node id found and added to the list so far
+    int highest_node_found = 0;
+
+    for (int i = 0; i < 2; i++) {
         // need to find all files and read through them
-        std::cout << "Node " << this->_id << ", iteration " << i + 1 << std::endl;
+        // starting at highest_node_found+1, try to find the nodes
+        bool keep_going = true;
+        for (int j = highest_node_found+1; keep_going; j++) {
+            std::string filename = "./temp/node_list/" + std::to_string(j) + ".txt";
+            std::ifstream node_file(filename);
+            if (!node_file.good()) {
+                keep_going = false;
+                continue;
+            }
+            if (node_file.is_open()) {
+                std::vector<std::string> words;
+                std::string word;
+                while (node_file >> word) {
+                    words.push_back(word);
+                }
+                if (words.size() != 3) {
+                    keep_going = false;
+                    continue;
+                }
+                if (words[2] == "finished") {
+                    NodeInfo n;
+                    n.id = std::stoi(words[0]);
+                    n.port = std::stoi(words[1]);
+                    this->node_list.push_back(&n);
+                    highest_node_found++;
+                }
+            }
+        }
+        std::cout << "Node " << this->_id << ", Nodes found: " << 
+                     this->node_list.size() << std::endl;
         sleep(2);
     }
 }

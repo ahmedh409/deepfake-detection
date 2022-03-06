@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
             execv(program, argv);
             exit(0);
         }
-        usleep(99990);
+        usleep(100000);
     }
 
     for (int i = 0; i < num_nodes; i++) {
