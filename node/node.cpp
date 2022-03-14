@@ -1,5 +1,6 @@
 // node.cpp
 #include "node.h"
+#include "comm.h"
 #include <cstdint>
 #include <vector>
 #include <unistd.h>
@@ -28,6 +29,8 @@ Node::Node(uint32_t id) {
         exit(1);
     }
 
+    struct comm::comm_info info;
+    comm::init_socket(info);
     this->loop();
 }
 
@@ -35,7 +38,7 @@ void Node::loop() {
     // highest node id found and added to the list so far
     int highest_node_found = 0;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 5; i++) {
         // need to find all files and read through them
         // starting at highest_node_found+1, try to find the nodes
         bool keep_going = true;
@@ -68,5 +71,7 @@ void Node::loop() {
         std::cout << "Node " << this->_id << ", Nodes found: " << 
                      this->node_list.size() << std::endl;
         sleep(2);
+
+        i;
     }
 }
