@@ -1,5 +1,8 @@
 # Deepfake Detection
 
+#### March 14th, 2022
+- TCP socket initialization, each node creates a socket
+
 #### March 6th, 2022
 - global node list part 2 (finished), all nodes can read from the folder
 
