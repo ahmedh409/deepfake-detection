@@ -29,8 +29,15 @@ Node::Node(uint32_t id) {
         exit(1);
     }
 
-    struct comm::comm_info info;
-    comm::init_socket(info);
+    struct comm::comm_info* info = (struct comm::comm_info*) 
+                                    malloc(sizeof(struct comm::comm_info));
+    info->port_number = (int) DEFAULT_PORT_NUMBER + this->_id;
+    printf("Id: %d, port: %d\n", this->_id, info->port_number);
+    
+    // keep trying to setup a socket until it works
+    while (comm::init(info) != 0) {
+        sleep(1);
+    }
     this->loop();
 }
 

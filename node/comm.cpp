@@ -16,7 +16,7 @@ extern int errno ;
 
 namespace comm {
 
-bool init_socket(comm_info &info) {
+int init(comm_info* info) {
     int sockfd;     // socket file descriptor
     // create the socket
     //  AF_INET means IPv4 (rather than IPv6)
@@ -29,13 +29,15 @@ bool init_socket(comm_info &info) {
         int errnum = errno;
         fprintf(stderr, "Value of errno: %d\n", errno);
         fprintf(stderr, "Error opening file: %s\n", strerror( errnum ));
-        return false;
+        return -1;
     }
+
+    info->sockfd = sockfd;
 
     // create the socket address struct (in means internet)
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;      // type of address is IPv4
-    addr.sin_port = htons(12829);   // convert to the correctly ordered unsigned short
+    addr.sin_port = htons(info->port_number);   // convert to the correctly ordered unsigned short
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");  // set IP to localhost
 
     // this is required to open the port back up quickly for rapid testing
@@ -51,12 +53,17 @@ bool init_socket(comm_info &info) {
         int errnum = errno;
         fprintf(stderr, "Value of errno: %d\n", errno);
         fprintf(stderr, "Error opening file: %s\n", strerror(errnum));
-        return false;
+        return -1;
     }
 
     // listening is handled by a different function
+    listen(sockfd, 0);
 
-    return true;
+    return 0;
+}
+
+int shutdown(comm_info* info) {
+    return close(info->sockfd);
 }
 
 void send(std::string message) {

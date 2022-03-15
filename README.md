@@ -1,5 +1,10 @@
 # Deepfake Detection
 
+#### March 15th, 2022
+- each node can now create its own socket on a unique port
+- function to close socket
+- first test case - create a socket
+
 #### March 14th, 2022
 - TCP socket initialization, each node creates a socket
 
