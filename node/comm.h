@@ -1,5 +1,8 @@
 // comm.h
 // Comm: a project library developed for communication functionality
+#ifndef COMM_H
+#define COMM_H
+
 #include <string>
 
 #define DEFAULT_PORT_NUMBER 12829
@@ -23,6 +26,12 @@ struct comm_info {
     // message buffer lock
 };
 
+struct node_contact_info {
+    int id;
+    int port;
+    bool connection_established;
+};
+
 
 // create and setup a socket
 int init(comm_info* info);
@@ -34,3 +43,5 @@ void send(std::string message);
 void recv();
 
 } // namespace comm
+
+#endif
