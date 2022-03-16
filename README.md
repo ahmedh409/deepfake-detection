@@ -1,5 +1,8 @@
 # Deepfake Detection
 
+#### March 16th, 2022
+- nodes now have a map from the IDs of all other nodes to their contact information
+
 #### March 15th, 2022
 - each node can now create its own socket on a unique port
 - function to close socket
