@@ -1,5 +1,12 @@
 # Deepfake Detection
 
+#### April 20th, 2022
+- created a new branch for `comms` - it's taking longer than expected but is still very important
+- made the decision to use `Boost::Asio` as a networking library to make comms simpler
+
+#### April 13th, 2022
+- TV interview
+
 #### March 16th, 2022
 - nodes now have a map from the IDs of all other nodes to their contact information
 
