@@ -18,6 +18,7 @@ extern int errno ;
 
 namespace comm {
 
+/*
 int init(comm_info* info) {
     int sockfd;     // socket file descriptor
     // create the socket
@@ -59,6 +60,15 @@ int init(comm_info* info) {
     }
 
     return 0;
+}
+*/
+
+// setup the TCP server
+int init(comm_info* info) {
+    // create the asio context
+    boost::asio::io_context io_context;
+    // create a TCP server
+    
 }
 
 void listen_and_accept(comm_info* info) {

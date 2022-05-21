@@ -1,5 +1,6 @@
 // node.cpp
 #include "node.h"
+#include "tcp_server.hpp"
 #include <cstdint>
 #include <vector>
 #include <unistd.h>
