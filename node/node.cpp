@@ -44,13 +44,8 @@ void Node::setup_communications() {
     this->comm_info.message_queue = &this->message_queue;
     this->comm_info.message_queue_lock = &this->message_queue_lock;
 
-    // keep trying to setup a socket until it works
-    while (comm::init(&this->comm_info) != 0) {
-        sleep(1);
-    }
-
     // create a thread to listen for incoming messages and connections
-    std::thread listener_thread(comm::listen_and_accept, &this->comm_info);
+    std::thread listener_thread(comm::run_tcp_server, &this->comm_info);
     // detaching the thread allows it to continue indefinitely and independently
     listener_thread.detach();
 }
@@ -66,6 +61,7 @@ comm::node_contact_info* Node::get_contact_info(int id) {
 void Node::process_messages() {
     this->message_queue_lock.lock();
     while (!this->message_queue.empty()) {
+        std::cout << "THERE IS A MESSAGE" << std::endl;
         std::cout << this->message_queue.empty() << std::endl;
         // pop the first message off the queue
         comm::message* m = this->message_queue.front();
@@ -146,6 +142,7 @@ void Node::loop() {
         }
         std::cout << "Node " << this->_id << ", Nodes found: " << 
                      this->node_ports.size() << std::endl;
+        // everything seems to work through here
         if (this->_id >= 1) {
             for (int i = 0; i < this->node_ports.size(); i++) {
                 comm::node_contact_info* node = this->get_contact_info(this->node_ports[i]);

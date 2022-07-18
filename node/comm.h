@@ -50,10 +50,13 @@ struct node_contact_info {
 
 
 // create and setup a socket
-int init(comm_info* info);
+//int init(comm_info* info);
+
+// setup and run TCP server to listen for connections and messages
+int run_tcp_server(comm_info* info);
 
 // listen for incoming connections and accept them
-void listen_and_accept(comm_info* info);
+//void listen_and_accept(comm_info* info);
 
 // establish a TCP connection as the client
 int initiate_connection(comm_info* info, node_contact_info* target);

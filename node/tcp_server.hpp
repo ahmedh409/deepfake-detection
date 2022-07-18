@@ -32,6 +32,7 @@ public:
 
     void start()
     {
+        std::cout << "CONNECTION RECEIVED AND HANDLED YAYYY" << std::endl;
         /*
         message_ = "";
 
@@ -51,6 +52,7 @@ private:
     void handle_write(const boost::system::error_code& /*error*/,
           size_t /*bytes_transferred*/)
     {
+        std::cout << "MESSAGE RECEIVED" << std::endl;
     }
 
     tcp::socket socket_;
@@ -75,6 +77,7 @@ private:
         acceptor_.async_accept(new_connection->socket(),
             boost::bind(&tcp_server::handle_accept, this, new_connection,
             boost::asio::placeholders::error));
+        std::cout << "BEGINNING ACCEPT LOOP" << std::endl;
     }
 
     void handle_accept(tcp_connection::pointer new_connection,
@@ -83,6 +86,16 @@ private:
             new_connection->start();
         }
 
+        std::cout << "NEW CONNECTION HANDLED" << std::endl;
+
+        // write to the socket
+        std::string message = "M";
+        boost::system::error_code ignored_error;
+        //boost::asio::write(socket, boost::asio::buffer(message),
+        //    boost::asio::transfer_all(), ignored_error);
+
+        // the connection has been handled
+        // reenter the asynchronous accept state
         start_accept();
     }
 

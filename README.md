@@ -1,5 +1,8 @@
 # Deepfake Detection
 
+#### May 21st, 2022
+- setup a TCP server as the listening half of each node's communication abilities
+
 #### April 20th, 2022
 - created a new branch for `comms` - it's taking longer than expected but is still very important
 - made the decision to use `Boost::Asio` as a networking library to make comms simpler

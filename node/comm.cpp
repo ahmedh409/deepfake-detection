@@ -1,5 +1,6 @@
 // comm.cpp
 #include "comm.h"
+#include "tcp_server.hpp"
 #include <iostream>
 #include <string>
 // not sure how many of these are actually necessary
@@ -10,6 +11,8 @@
 #include <arpa/inet.h>
 
 #include <boost/asio.hpp>
+#include <boost/array.hpp>
+using boost::asio::ip::tcp;
 
 #include <errno.h>
 #include <string.h>
@@ -64,13 +67,25 @@ int init(comm_info* info) {
 */
 
 // setup the TCP server
-int init(comm_info* info) {
-    // create the asio context
-    boost::asio::io_context io_context;
-    // create a TCP server
+int run_tcp_server(comm_info* info) {
+    std::cout << "Starting tcp server" << std::endl;
+    try {
+        // create the asio context
+        boost::asio::io_context io_context;
+        // create a TCP server
+        tcp_server server(io_context, info->port_number);
+        io_context.run();
+    } catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
+
+    std::cout << "It should only reach this if it crashes" << std::endl;
+
+    return 0;
     
 }
 
+/*
 void listen_and_accept(comm_info* info) {
     // the socket listens for incoming connection requests
     // listen() is a non-blocking function,
@@ -119,7 +134,9 @@ void listen_and_accept(comm_info* info) {
         std::cout << "AHHHHHHHHHH4" << std::endl;
     }
 }
+*/
 
+/*
 int initiate_connection(comm_info* info, node_contact_info* target) {
     struct sockaddr_in target_address;
     target_address.sin_family = AF_INET;
@@ -137,6 +154,28 @@ int initiate_connection(comm_info* info, node_contact_info* target) {
     }
     target->connection_established = true;
     return successful;
+}
+*/
+
+// TODO: finish this as next step
+int initiate_connection(comm_info* info, node_contact_info* target) {
+    boost::asio::io_context io_context;
+    tcp::resolver resolver(io_context);
+    tcp::resolver::results_type endpoints =
+        resolver.resolve("127.0.0.1", std::to_string(info->port_number));
+    
+    tcp::socket socket(io_context);
+    boost::asio::connect(socket, endpoints);
+
+    sleep(2);
+    std::cout << "INITIATED" << std::endl;
+    
+    std::string message = "M";
+    boost::system::error_code ignored_error;
+    boost::asio::write(socket, boost::asio::buffer(message),
+        boost::asio::transfer_all(), ignored_error);
+    
+    return 1;
 }
 
 int shutdown(comm_info* info) {
