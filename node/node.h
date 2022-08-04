@@ -9,6 +9,10 @@
 #include <mutex>
 #include "comm.h"
 
+#include <boost/asio.hpp>
+using boost::asio::ip::tcp;
+
+
 class Node {
 public:
     // constructor
@@ -17,6 +21,8 @@ public:
     // we currently have memory leaks, fix this with destructor
 
 private:
+    int highest_node_found;
+
     // form of identification
     int _id;
     struct comm::comm_info comm_info;
@@ -26,30 +32,40 @@ private:
     Initialization tasks
     *****/
     void setup_communications();
+    void publish_information();
 
     // list of all node IDs, used to index into the map
-    std::vector<int> node_ports;//node_ids;
+    std::vector<int> node_ids;
     // map of node IDs to their contact information
     std::map<int, comm::node_contact_info*> node_contact_map;
 
     // get a node's contact information from its ID
     comm::node_contact_info* get_contact_info(int id);
 
+    // find all the other nodes
+    void find_other_nodes();
+
+    /*****
+    Communication
+    *****/
+    void send(int target_id, std::string message);
+
     /*****
     Process incoming messages
     *****/
     // message queue
-    std::deque<comm::message*> message_queue;
+    std::deque<comm::message> message_queue;
     // lock for the message queue
     std::mutex message_queue_lock;
     // submethod of the main loop to handle all messages on the message queue
     void process_messages();
 
+    /*****
+    Loop
+    *****/
     // main loop, runs indefinitely
     void loop();
 
-    // need to implement some sort of digital signature scheme
-    // here
 };
 
 #endif

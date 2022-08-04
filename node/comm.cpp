@@ -1,193 +1,150 @@
 // comm.cpp
 #include "comm.h"
-#include "tcp_server.hpp"
 #include <iostream>
 #include <string>
-// not sure how many of these are actually necessary
-#include <unistd.h>
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 #include <boost/asio.hpp>
-#include <boost/array.hpp>
 using boost::asio::ip::tcp;
 
-#include <errno.h>
-#include <string.h>
-#include <stdio.h>
-extern int errno ;
 
 namespace comm {
 
-/*
-int init(comm_info* info) {
-    int sockfd;     // socket file descriptor
-    // create the socket
-    //      AF_INET means IPv4 (rather than IPv6)
-    //      SOCK_STREAM means TCP (rather than UDP)
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        // socket created unsuccessfully, do not proceed
-        // could alternatively raise an error
-        printf("Failed at socket creation\n");
-        int errnum = errno;
-        fprintf(stderr, "Value of errno: %d\n", errno);
-        fprintf(stderr, "Error opening file: %s\n", strerror( errnum ));
-        return -1;
-    }
-
-    info->sockfd = sockfd;
-
-    // create the socket address struct (in means internet)
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;      // type of address is IPv4
-    addr.sin_port = htons(info->port_number);   // convert to the correctly ordered unsigned short
-    addr.sin_addr.s_addr = inet_addr("127.0.0.1");  // set IP to localhost
-
-    // this is required to open the port back up quickly for rapid testing
-    // this sets the REUSE ADDRESS option to 1 (on)
-    int one = 1;
-    setsockopt(info->sockfd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-    
-    // bind the socket
-    if (bind(info->sockfd, (struct sockaddr*) &addr, sizeof(addr)) < 0) {
-        // socket bound unsuccessfully, do not proceed
-        // could alternatively raise an error
-        printf("Failed at binding\n");
-        int errnum = errno;
-        fprintf(stderr, "Value of errno: %d\n", errno);
-        fprintf(stderr, "Error opening file: %s\n", strerror(errnum));
-        return -1;
-    }
-
-    return 0;
-}
-*/
-
-// setup the TCP server
-int run_tcp_server(comm_info* info) {
-    std::cout << "Starting tcp server" << std::endl;
+// run the TCP server
+void run_tcp_server(comm_info* info) {
     try {
         // create the asio context
         boost::asio::io_context io_context;
-        // create a TCP server
-        tcp_server server(io_context, info->port_number);
-        io_context.run();
+
+        // create the acceptor which will listen on the port for incoming connections
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), info->port_number));
+        boost::system::error_code ec;
+        acceptor.set_option(tcp::acceptor::reuse_address(true), ec);
+
+        for (;;) {
+            // wait for a connection and bind it to a socket
+            std::shared_ptr<tcp::socket> socket = std::make_shared<tcp::socket>(io_context);
+            acceptor.accept(*socket);
+
+            // add a message to the queue indicating a new connection
+            if (!(*socket).is_open()) {
+                std::cout << "Error: socket failed to open" << std::endl;
+                continue;
+            }
+            
+            boost::asio::streambuf sb;
+            boost::system::error_code ec;
+            boost::asio::read(*socket, sb, boost::asio::transfer_exactly(5), ec);
+            std::string message(boost::asio::buffers_begin(sb.data()), 
+                                boost::asio::buffers_begin(sb.data()) + sb.size());
+            
+            if (ec) {
+                std::cout << "status: " << ec.message() << "\n";
+                break;
+            }
+
+            struct message m = {0, socket, std::stoi(message), ""};
+            info->message_queue_lock->lock();
+            info->message_queue->push_back(m);
+            info->message_queue_lock->unlock();
+        }
     } catch (std::exception& e) {
+        std::cout << "----- SERVER CRASHED -----" << std::endl;
         std::cerr << e.what() << std::endl;
     }
-
-    std::cout << "It should only reach this if it crashes" << std::endl;
-
-    return 0;
-    
 }
 
-/*
-void listen_and_accept(comm_info* info) {
-    // the socket listens for incoming connection requests
-    // listen() is a non-blocking function,
-    //      it puts the socket in a passive state so it is ready to accept
-    int backlog_size = 2;   // number of requests to store while others are processed
-    listen(info->sockfd, backlog_size);
+// connect to a TCP server
+int initiate_connection(comm_info* info, node_contact_info* target) {
+    try {
+        // create the asio context
+        boost::asio::io_context io_context;
 
-    // accept() is a blocking function, so it will hang until a request comes
-    // infinite accept loop
-    while (true) {
-        // create the struct to hold the requester's information
-        struct sockaddr* client_address = (struct sockaddr*) malloc(sizeof(struct sockaddr_in));
-        socklen_t address_len = sizeof(client_address);
+        // resolve the address to an endpoint
+        tcp::resolver resolver(io_context);
+        tcp::resolver::results_type endpoints =
+            resolver.resolve("127.0.0.1", std::to_string(target->port));
+    
+        // make the connection and bind it to a socket
+        std::shared_ptr<tcp::socket> socket = std::make_shared<tcp::socket>(io_context);
+        boost::asio::connect(*socket, endpoints);
 
-        int client_sockfd = accept(info->sockfd, client_address, &address_len);
+        // this is necessary to make sure the server has had time to initiate a read
+        sleep(1);
 
-        std::cout << "AHHHHHHHHHH" << std::endl;
-
-        if (client_sockfd < 0) {
-            printf("Failed to accept incoming connection\n");
-            delete client_address;
-            continue;
+        // send ID to finish handshake
+        boost::system::error_code ec;
+        boost::asio::write(*socket, boost::asio::buffer(std::to_string(info->port_number)), ec);
+        if (ec) {
+            std::cout << "status: " << ec.message() << "\n";
+            return -1;
         }
 
-        std::cout << "AHHHHHHHHHH2" << std::endl;
-
-        // create a message
-        struct message* m = (struct message*) malloc(sizeof(struct message));
-        std::cout << "wtf" << std::endl;
-        m->type = 0;    // connection flag
-        std::cout << "wtf2" << std::endl;
-        m->sender = client_address;
-        std::cout << "wtf3" << std::endl;
-        //m->body.assign("");
-        std::cout << "wtf4" << std::endl;
-
-        std::cout << "AHHHHHHHHHH3" << std::endl;
-
-        // add the message to the message queue
+        struct message m = {0, socket, target->port, ""};
         info->message_queue_lock->lock();
         info->message_queue->push_back(m);
         info->message_queue_lock->unlock();
 
-
-
-        std::cout << "AHHHHHHHHHH4" << std::endl;
+    } catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
     }
+    
+    return 0;
 }
-*/
 
-/*
-int initiate_connection(comm_info* info, node_contact_info* target) {
-    struct sockaddr_in target_address;
-    target_address.sin_family = AF_INET;
-    target_address.sin_port = htons(target->port);
-    target_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+// convert a packet into a string representation to be sent over the network
+std::string packet_to_string(struct packet p) {
+    std::string size = "";
+    if (p.size <= 999) {
+        size += "0";
+    }
+    if (p.size <= 99) {
+        size += "0";
+    }
+    if (p.size <= 9) {
+        size += "0";
+    }
+    size += std::to_string(p.size);
+    return (size + p.message);
+}
 
-    //int successful = connect(info->send_sockfd, (struct sockaddr*) &target_address, sizeof(target_address));
-    int successful = 1;
-    if (successful < 0) {
-        printf("Failed on establishing connection\n");
-        int errnum = errno;
-        fprintf(stderr, "Value of errno: %d\n", errno);
-        fprintf(stderr, "Error opening file: %s\n", strerror(errnum));
+// convert string message into packet and send
+int send(std::shared_ptr<tcp::socket> socket, std::string message) {
+    struct packet p = {(int) message.size(), message};
+    if (p.size > 9999) {
         return -1;
     }
-    target->connection_established = true;
-    return successful;
-}
-*/
-
-// TODO: finish this as next step
-int initiate_connection(comm_info* info, node_contact_info* target) {
-    boost::asio::io_context io_context;
-    tcp::resolver resolver(io_context);
-    tcp::resolver::results_type endpoints =
-        resolver.resolve("127.0.0.1", std::to_string(info->port_number));
-    
-    tcp::socket socket(io_context);
-    boost::asio::connect(socket, endpoints);
-
-    sleep(2);
-    std::cout << "INITIATED" << std::endl;
-    
-    std::string message = "M";
-    boost::system::error_code ignored_error;
-    boost::asio::write(socket, boost::asio::buffer(message),
-        boost::asio::transfer_all(), ignored_error);
-    
-    return 1;
+    socket->send(boost::asio::buffer(packet_to_string(p)));
+    return 0;
 }
 
-int shutdown(comm_info* info) {
-    return close(info->sockfd);
-}
+void recv(comm_info* info, std::shared_ptr<tcp::socket> socket, int port) {
+    for (;;) {
+        if (socket->available() == 0) {
+            continue;
+        }
 
-void send(std::string message) {
-    std::cout << "Sending message: " << message << std::endl;
-}
+        // read the first 4 bytes containing the size of the incoming message
+        boost::asio::streambuf sb;
+        boost::system::error_code ec;
 
-void recv() {
-    std::cout << "Receiving message" << std::endl;
+        boost::asio::read(*socket, sb, boost::asio::transfer_exactly(4), ec);
+        std::string message_size(boost::asio::buffers_begin(sb.data()), 
+                                 boost::asio::buffers_begin(sb.data()) + sb.size());
+        int size = std::stoi(message_size);
+
+
+        // read the message body
+        boost::asio::read(*socket, sb, boost::asio::transfer_exactly(size), ec);
+        std::string message_body(boost::asio::buffers_begin(sb.data()) + 4, 
+                                 boost::asio::buffers_begin(sb.data()) + sb.size());
+        
+
+        // add the message to the message queue
+        struct message m = {1, NULL, port, message_body};
+        info->message_queue_lock->lock();
+        info->message_queue->push_back(m);
+        info->message_queue_lock->unlock();
+    }
 }
 
 } // namespace comm

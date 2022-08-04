@@ -1,5 +1,14 @@
 # Deepfake Detection
 
+#### August 3rd
+- comms is finally complete
+- all nodes run a TCP server and establish connections with all other nodes
+- all nodes can send to and receive from all other nodes
+
+#### July 21st
+- TCP connections are now handled by a list of sockets
+- major cleanup
+
 #### May 21st, 2022
 - setup a TCP server as the listening half of each node's communication abilities
 
