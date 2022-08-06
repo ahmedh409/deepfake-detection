@@ -46,6 +46,18 @@ private:
     void find_other_nodes();
 
     /*****
+    Handle command-line input
+    *****/
+    typedef struct {
+        std::deque<std::string> input_queue;
+        std::mutex input_queue_lock;
+    } input_information;
+
+    input_information input_info;
+    static void read_input(input_information* input_info);
+    void handle_input();
+
+    /*****
     Communication
     *****/
     void send(int target_id, std::string message);

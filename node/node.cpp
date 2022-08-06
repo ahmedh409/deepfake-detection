@@ -1,6 +1,5 @@
 // node.cpp
 #include "node.h"
-#include "tcp_server.hpp"
 #include <cstdint>
 #include <vector>
 #include <unistd.h>
@@ -22,7 +21,11 @@ Node::Node(int id) {
     this->publish_information();
 
     // highest node id found and added to the list so far
-    this->highest_node_found = 0;
+    this->highest_node_found = -1;
+
+    // setup the thread to listen for external input (from the user/simulator)
+    std::thread input_thread(&this->read_input, &this->input_info);
+    input_thread.detach();
 
     // allow nodes to publish their information
     sleep(2);
@@ -54,6 +57,41 @@ void Node::setup_communications() {
     std::thread listener_thread(comm::run_tcp_server, &this->comm_info);
     // detaching the thread allows it to continue indefinitely and independently
     listener_thread.detach();
+}
+
+// constantly read from standard input and add input to a command queue
+// any check to cin blocks until input is ready, so this runs in a separate thread
+void Node::read_input(input_information* input_info) {
+    for (;;) {
+        std::string command;
+        getline(std::cin, command);
+        if (command == "") {
+            continue;
+        }
+
+        // add the command to the queue to be processed
+        input_info->input_queue_lock.lock();
+        input_info->input_queue.push_back(command);
+        input_info->input_queue_lock.unlock();
+    }
+}
+
+/* handle command-line input, the valid options are:
+    * add [image_file (string)]
+    * search [hash (string)]
+    * send [target_id (int)] [message (string)]
+*/
+void Node::handle_input() {
+    this->input_info.input_queue_lock.lock();
+    
+    // if there is input available, pop the first command off the queue
+    while (!this->input_info.input_queue.empty()) {
+        std::string command = this->input_info.input_queue.front();
+        this->input_info.input_queue.pop_front();
+        std::cout << "INPUT RECEIVED: " << command << std::endl;
+    }
+
+    this->input_info.input_queue_lock.unlock();
 }
 
 // get a node's contact information from its ID
@@ -158,6 +196,7 @@ void Node::find_other_nodes() {
 void Node::loop() {
     this->process_messages();
     this->find_other_nodes();
+    this->handle_input();
 
     int num_connections = 0;
     for (int i = 0; i < this->node_ids.size(); i++) {
