@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 class Simulator {
 
@@ -11,7 +13,7 @@ public:
 
     Simulator(int num_nodes) : num_nodes(num_nodes) {
         this->launch_nodes();
-        this->send_command(0, "test command");
+        sleep(4);
     }
 
     // sleep then shutdown the nodes
@@ -20,7 +22,6 @@ public:
         this->shutdown_nodes();
     }
 
-private:
     int num_nodes;
     std::vector<int> pipes;
 

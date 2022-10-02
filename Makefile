@@ -24,3 +24,4 @@ clean :
 	rm -r -f *.out temp/*
 	find . -type f -name '*.o' -delete
 	mkdir temp/node_list
+	mkdir temp/blockchain

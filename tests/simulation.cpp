@@ -15,6 +15,8 @@ int main(int argc, char** argv) {
     int num_nodes = atoi(argv[1]);
 
     Simulator s(num_nodes);
+    std::cout << "HEY WTF" << std::endl;
+    s.send_command(0, "add /home/sam/research/deepfake/code/color.jpeg");
     s.terminate_after(12);
     return 0;
 }

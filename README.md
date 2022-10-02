@@ -1,11 +1,21 @@
 # Deepfake Detection
 
-#### August 3rd
+#### October 1st, 2022
+- updated test suite with 2 tests for Ahmed to fill in
+- nodes build a blockchain locally and export it to a file to be verified
+- 90% with all of v0.2 - still have testing and debugging
+
+#### August 6th, 2022
+- new simulator
+- simulator can pass input to nodes
+- nodes run a thread to listen for input from standard input
+
+#### August 3rd, 2022
 - comms is finally complete
 - all nodes run a TCP server and establish connections with all other nodes
 - all nodes can send to and receive from all other nodes
 
-#### July 21st
+#### July 21st, 2022
 - TCP connections are now handled by a list of sockets
 - major cleanup
 

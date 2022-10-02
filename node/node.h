@@ -4,10 +4,12 @@
 
 #include <cstdint>
 #include <vector>
+#include <fstream>
 #include <deque>
 #include <map>
 #include <mutex>
 #include "comm.h"
+#include "../blockchain/block.h"
 
 #include <boost/asio.hpp>
 using boost::asio::ip::tcp;
@@ -61,6 +63,8 @@ private:
     Communication
     *****/
     void send(int target_id, std::string message);
+    // send message to all nodes
+    void broadcast(std::string message);
 
     /*****
     Process incoming messages
@@ -71,6 +75,19 @@ private:
     std::mutex message_queue_lock;
     // submethod of the main loop to handle all messages on the message queue
     void process_messages();
+
+    /*****
+    Blockchain
+    *****/
+    // the file storing the blockchain
+    //std::ofstream blockchain_file;
+    std::vector<std::string> blockchain;    // each element is a hash
+    // convert an image file (specified by path) to a hash, returns "" if it fails
+    std::string hash_image(std::string filename);
+    // add the hash to the personal chain and broadcast to all other node
+    int add_hash_to_chain(std::string hash);
+    // search the chain for a specific hash
+    bool search_chain(std::string hash);
 
     /*****
     Loop

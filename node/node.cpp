@@ -8,6 +8,8 @@
 #include <string>
 #include <thread>
 
+#include "../hashing/phash.h"
+
 #include <boost/asio.hpp>
 using boost::asio::ip::tcp;
 
@@ -83,12 +85,36 @@ void Node::read_input(input_information* input_info) {
 */
 void Node::handle_input() {
     this->input_info.input_queue_lock.lock();
-    
+
     // if there is input available, pop the first command off the queue
     while (!this->input_info.input_queue.empty()) {
         std::string command = this->input_info.input_queue.front();
         this->input_info.input_queue.pop_front();
-        std::cout << "INPUT RECEIVED: " << command << std::endl;
+
+        // break the string into words using " " as a delimeter
+        std::vector<std::string> command_words;
+        size_t pos = 0;
+        std::string word;
+        while ((pos = command.find(" ")) != std::string::npos) {
+            word = command.substr(0, pos);
+            command_words.push_back(word);
+            command.erase(0, pos + 1);
+        }
+        command_words.push_back(command);
+
+        // handle each type of input
+        std::string command_type = command_words[0];
+        if (command_type == "add") {
+            std::string hash = this->hash_image(command_words[1]);
+            this->add_hash_to_chain(hash);
+        } else if (command_type == "search") {
+            this->search_chain(command_words[1]);
+            // need a way of actually passing the output back to the simulator
+        } else if (command_type == "send") {
+            int target_id = std::stoi(command_words[1]);
+            this->send(target_id, command_words[2]);
+        }
+
     }
 
     this->input_info.input_queue_lock.unlock();
@@ -107,6 +133,13 @@ void Node::send(int target_id, std::string message) {
         return;
     }
     comm::send(target->socket, message);
+}
+
+// send message to all nodes
+void Node::broadcast(std::string message) {
+    for (int i = 0; i < this->node_ids.size(); i++) {
+        this->send(this->node_ids[i], message);
+    }
 }
 
 // handle all incoming messages off of the message queue
@@ -142,6 +175,14 @@ void Node::process_messages() {
             // message
             case 1 :
                 {
+                    // hash received
+                    this->blockchain.push_back(m.body);
+                    std::string filename = "./temp/blockchain/" + std::to_string(this->_id) + ".txt";
+                    std::ofstream blockchain_file;
+                    blockchain_file.open(filename, std::fstream::out | std::fstream::trunc);
+                    blockchain_file << m.body << std::endl;
+                    blockchain_file.close();
+
                     break;
                 }
         }
@@ -193,6 +234,37 @@ void Node::find_other_nodes() {
     }
 }
 
+// convert an image file (specified by path) to a hash, returns "" if it fails
+std::string Node::hash_image(std::string filename) {
+    return hash::generate_phash(filename);
+}
+
+// add the hash to the personal chain and broadcast to all other node
+int Node::add_hash_to_chain(std::string hash) {
+    // add the hash to the personal blockchain
+    this->blockchain.push_back(hash);
+    // broadcast the hash to all nodes
+    this->broadcast(hash);
+
+    std::string filename = "./temp/blockchain/" + std::to_string(this->_id) + ".txt";
+    std::ofstream blockchain_file;
+    blockchain_file.open(filename, std::fstream::out | std::fstream::trunc);
+    blockchain_file << hash << std::endl;
+    blockchain_file.close();
+
+    return 1;
+}
+
+// search the chain for a specific hash
+bool Node::search_chain(std::string hash) {
+    for (std::string s : this->blockchain) {
+        if (s == hash) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Node::loop() {
     this->process_messages();
     this->find_other_nodes();
@@ -201,8 +273,6 @@ void Node::loop() {
     int num_connections = 0;
     for (int i = 0; i < this->node_ids.size(); i++) {
         comm::node_contact_info* node = this->get_contact_info(this->node_ids[i]);
-        //std::cout << "Node " << this->node_ids[i] << ", Port : " << node->port <<
-       //             ", Connected : " << node->connection_established << std::endl;
         if (node->connection_established) {
             num_connections++;
         }

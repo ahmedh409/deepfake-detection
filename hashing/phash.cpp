@@ -15,7 +15,9 @@
 
 // NOTE: psuedocode from http://hackerfactor.com/blog/index.php%3F/archives/432-Looks-Like-It.html 
 
-// global temporarily
+namespace hash {
+
+// global
 int width, height, bpp;
 
 // reads the image from the file system in RGB format
@@ -82,7 +84,6 @@ std::string construct_hash(std::vector<int> bits) {
         }
     }
 
-    std::cout << "DONE" << std::endl;
     return hash;
 }
 
@@ -93,7 +94,6 @@ std::string generate_phash(std::string file_name) {
     uint8_t* small_rgb_image = reduce_size(full_image);
     uint8_t* grayscale_image = grayscale(small_rgb_image);
 
-    std::cout << "grayscale vector conversion...";
     // convert to vector
     std::vector<int> pixels_gray;
     int sum = 0;
@@ -102,7 +102,6 @@ std::string generate_phash(std::string file_name) {
         sum += grayscale_image[i];
     }
 
-    std::cout << "discretizing to hex...";
     int average = sum / 64;
     // if pixel value above threshold (average), then 1, else 0
     std::vector<int> bits;
@@ -119,14 +118,4 @@ std::string generate_phash(std::string file_name) {
     return construct_hash(bits);;
 }
 
-// testing
-/*
-int main() {
-    std::cout << "Enter a file name: ";
-    std::string file_name;
-    std::cin >> file_name;
-    std::cout << file_name << std::endl;
-
-    std::cout << generate_phash(file_name) << std::endl;
-}
-*/
+} // namespace hash
