@@ -1,5 +1,34 @@
 # Deepfake Detection
 
+#### October 1st, 2022
+- updated test suite with 2 tests for Ahmed to fill in
+- nodes build a blockchain locally and export it to a file to be verified
+- 90% with all of v0.2 - still have testing and debugging
+
+#### August 6th, 2022
+- new simulator
+- simulator can pass input to nodes
+- nodes run a thread to listen for input from standard input
+
+#### August 3rd, 2022
+- comms is finally complete
+- all nodes run a TCP server and establish connections with all other nodes
+- all nodes can send to and receive from all other nodes
+
+#### July 21st, 2022
+- TCP connections are now handled by a list of sockets
+- major cleanup
+
+#### May 21st, 2022
+- setup a TCP server as the listening half of each node's communication abilities
+
+#### April 20th, 2022
+- created a new branch for `comms` - it's taking longer than expected but is still very important
+- made the decision to use `Boost::Asio` as a networking library to make comms simpler
+
+#### April 13th, 2022
+- TV interview
+
 #### March 16th, 2022
 - nodes now have a map from the IDs of all other nodes to their contact information
 
