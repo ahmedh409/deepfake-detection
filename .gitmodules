@@ -1,0 +1,3 @@
+[submodule "PeregrineDHT"]
+	path = PeregrineDHT
+	url = https://github.com/apfoser/PeregrineDHT.git
