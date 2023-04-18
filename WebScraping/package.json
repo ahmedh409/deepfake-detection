@@ -1,0 +1,19 @@
+{
+  "type": "commonjs",
+  "dependencies": {
+    "es6-promise": "^4.2.8",
+    "https": "^1.0.0",
+    "isomorphic-fetch": "^3.0.0",
+    "puppeteer": "^19.8.1",
+    "puppeteer-har": "^1.1.2"
+  },
+  "name": "perigrine",
+  "version": "1.0.0",
+  "description": "Webscraping",
+  "main": "puppeteer.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Brian Tufts",
+  "license": "ISC"
+}
