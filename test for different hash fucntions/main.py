@@ -2,6 +2,7 @@
 
 from Image_Array_Generater import Image_Array_Generater
 from Phash_test_compress import Phash_test_compress
+from Phash_test_rotate import Phash_test_rotate
 
 # im=Image.open('img.png')
 # # im.show()
@@ -42,10 +43,18 @@ from Phash_test_compress import Phash_test_compress
 # test.calculate_hash()
 # print(test.hash_difference)
 
+# IG=Image_Array_Generater()
+# IG.getImageArray("testDataCompress")
+# test=Phash_test_compress(IG.image_array)
+# test.compress(9)
+# test.calculate_hash()
+# print(test.hash_difference)
+
 IG=Image_Array_Generater()
 IG.getImageArray("testDataCompress")
-test=Phash_test_compress(IG.image_array)
-test.compress(9)
+test=Phash_test_rotate(IG.image_array)
+test.rotate(90)
 test.calculate_hash()
 print(test.hash_difference)
+
 
