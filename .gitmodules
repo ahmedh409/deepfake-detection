@@ -1,3 +1,6 @@
 [submodule "PeregrineDHT"]
 	path = PeregrineDHT
 	url = https://github.com/apfoser/PeregrineDHT.git
+[submodule "perceptographic"]
+	path = perceptographic
+	url = https://github.com/sambux1/perceptographic.git
