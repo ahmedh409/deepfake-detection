@@ -1,113 +1,163 @@
-# Peregrine Deepfake Detection
+# Peregrine: Decentralized Deepfake Detection & Media Provenance
 
-As seen on:
+A research prototype for verifying the authenticity of digital media using **perceptual hashing, distributed ledgers, and peer-to-peer verification**.
 
-UVA students working on deepfake detection technology
-https://www.29news.com/2021/06/16/uva-students-working-deepfake-detection-technology/
+The project originated at the University of Virginia as an alternative to treating deepfake detection purely as an image-classification problem. Instead of relying exclusively on a machine-learning model to decide whether pixels "look fake," Peregrine explores whether trusted media can be authenticated through **provenance**: generating robust signatures for legitimate media and preserving those signatures in a distributed, tamper-resistant record.
 
-Swapped Out: Hackers target social media users with high-tech fake videos
-https://www.wbko.com/2022/05/16/swapped-out-hackers-target-social-media-users-with-high-tech-fake-videos/
+The original concept won **1st place in the 2021 iDISPLA University Adversarial AI/ML Challenge.
 
-UVA Undergrads Offer New Approach to Detecting ‘Deepfake’ Videos
-https://news.virginia.edu/content/uva-undergrads-offer-new-approach-detecting-deepfake-videos
+## Motivation
 
+Deepfake-generation methods improve rapidly. A detector trained against today's manipulation techniques can therefore become less effective against tomorrow's -- but can we verify where media came from rather than relying only on detecting how it was manipulated?
 
-#### October 1st, 2022
-- updated test suite with 2 tests for Ahmed to fill in
-- nodes build a blockchain locally and export it to a file to be verified
-- 90% with all of v0.2 - still have testing and debugging
+The proposed architecture combines:
 
-#### August 6th, 2022
-- new simulator
-- simulator can pass input to nodes
-- nodes run a thread to listen for input from standard input
+1. Trusted media publishers
+2. Perceptual media hashing
+3. Cryptographic hashing
+4. A distributed ledger
+5. Peer-to-peer verification
+6. ML detection where provenance alone is insufficient
 
-#### August 3rd, 2022
-- comms is finally complete
-- all nodes run a TCP server and establish connections with all other nodes
-- all nodes can send to and receive from all other nodes
+The goal is not to eliminate ML, but to reduce the burden placed on a single centralized deepfake-classification model.
 
-#### July 21st, 2022
-- TCP connections are now handled by a list of sockets
-- major cleanup
+## Concept
 
-#### May 21st, 2022
-- setup a TCP server as the listening half of each node's communication abilities
+A simplified workflow looks like this:
 
-#### April 20th, 2022
-- created a new branch for `comms` - it's taking longer than expected but is still very important
-- made the decision to use `Boost::Asio` as a networking library to make comms simpler
+```text
+        Trusted Publisher
+               │
+               ▼
+        Original Media
+               │
+               ▼
+      Perceptual Hashing
+               │
+               ▼
+      Cryptographic Record
+               │
+               ▼
+       Distributed Ledger
+        /      |       \
+       /       |        \
+    Node A   Node B    Node C
+       \       |        /
+        \      |       /
+          Verification
+               │
+               ▼
+        Media Consumer
+```
 
-#### April 13th, 2022
-- TV interview
+When trusted media is published, the system generates a signature representing that media. The signature can then be stored in a ledger shared across participating nodes. When a user later encounters a piece of media, its signature can be compared against trusted records to help determine whether it corresponds to authenticated content or may have been altered. Perceptual hashing is useful because ordinary cryptographic hashes change completely when even one bit changes. Media, however, is routinely resized, compressed, transcoded, or otherwise modified without changing its semantic content.
 
-#### March 16th, 2022
-- nodes now have a map from the IDs of all other nodes to their contact information
+## What This Repository Implements
 
-#### March 15th, 2022
-- each node can now create its own socket on a unique port
-- function to close socket
-- first test case - create a socket
+This repository contains prototype implementations of several pieces of that architecture.
 
-#### March 14th, 2022
-- TCP socket initialization, each node creates a socket
+### Blockchain / ledger
 
-#### March 6th, 2022
-- global node list part 2 (finished), all nodes can read from the folder
+C++ data structures for maintaining a blockchain-like record of media information. The prototype includes cryptographic hashing and early proof-of-work experimentation used to explore immutable record storage.
 
-#### March 2nd, 2022
-- global node list part 1, all nodes publish a file to a folder
+### Perceptual hashing
 
-#### March 1st, 2022
-- modified `interactivesystemtest.cpp` to include searching the chain
-- updated the Makefile to build multiple targets
-- we can now run nodes as their own programs
-- added a simulation which creates many node processes
+Prototype image-hashing functionality for creating signatures that remain useful when comparing transformed media.
 
-Finished with v0.1! Beginning work on v0.2.
+### Distributed nodes
 
-#### February 22nd, 2022
-- perceptual image hashing finished, needs debugging
-- removed `main.cpp`, `tests/interactive_system_test.cpp` is now used as file for testing
-- integrated image hashing with other functions
-- updated Makefile
-- refactored code
-- restructured files and folders
-- added `doge.jpeg`, `mars.jpeg`, and `color.jpeg` for testing
-- added `num_blocks` field for blockchain object
-- adjusted CLI output
+Nodes are modeled as independent processes participating in the network. Development work in this repository includes:
 
-Almost completed v0.1! Light debugging of hashing necessary before done.
+* unique node identities and network information
+* independent node processes
+* local blockchain construction
+* blockchain export and verification
+* node simulation
+* peer discovery / node lists
 
-#### February 21st, 2022
-- finished the first version of perceptual image hashing (rough)
+### Peer-to-peer communication
 
-#### February 14th, 2022
-- added pseudocode framework for image hashing, still needs to be implemented
-- chose an image I/O library
+Networking functionality was developed around TCP sockets and Boost.Asio. The prototype progressed to a state in which participating nodes could:
 
-#### February 9th, 2022
-- added a framework for a full system test, can't actually test anything until image hashing is ready
+* run their own TCP server
+* establish connections with other nodes
+* maintain multiple peer sockets
+* send data to other nodes
+* receive data from other nodes
 
-#### February 8th, 2022
-- added a global list of nodes so nodes are aware of all others
-- installed lightweight unit testing framework (open source on Github)
+## Repository Structure
 
-#### February 7th, 2022
-- removed `using namespace std` from all files, added `std::` prefixes
-- `main.cpp` can now handle variable numbers of blocks, each with their own unique string data
-- created `blockchain::display(void)` function to output the blockchain (visually) to CLI
-- added more/cleaned comments
-- adjusted CLI output
+```text
+deepfake-detection/
+├── blockchain/        # blockchain / ledger implementation
+├── hashing/           # perceptual and cryptographic hashing work
+├── node/              # distributed-node and networking logic
+├── perceptographic/   # external perceptual-hashing dependency/submodule
+├── tests/             # system and component tests
+├── Makefile
+└── testing-harness.cpp
+```
 
-Made client more user-friendly.
+## Building
 
-#### February 6th, 2022
-- created `blockchain.h` and `blockchain.cpp` for data structure
-- created `block.h` and `block.cpp` for block objects
-- `main.cpp` creates 1 genesis block and 3 extra blocks for testing purposes
-- created dummy `node` class
-- created `comm` files 
-- created Makefile for outputting `a.out`, with `make clean` command to delete `a.out`
+This is an older research prototype, not a maintained production security package. Modern compilers and library versions may require minor changes.
 
-Project currently uses SHA-256 algorithm for hashing during block mining (found online: http://www.zedwood.com/article/cpp-sha256-function). Current TestChain is proof-of-work (PoW), not sure how to make it proof-of-stake (PoS), or if even necessary. Current TestChain is only able to handle strings as block data, will need to upgrade this to other forms of media (specifically videos). "Nodes" will eventually be the primary actors in the network, acting as individual computers on the network. Comm library will abstract away all communication details. Need to change namespace as this can cause problems for larger projects - basically delete `using namespace std`.
+Clone the repository and its submodules:
+
+```bash
+git clone --recurse-submodules https://github.com/ahmedh409/deepfake-detection.git
+cd deepfake-detection
+```
+
+The project includes a `Makefile` for building the prototype:
+
+```bash
+make
+```
+
+See the source tree and Makefile for the currently available test and simulation targets.
+
+## Project History
+
+### 2021 — iDISPLA Challenge
+
+The original deepfake-provenance concept was developed by Ahmed Hussain, then an undergraduate computer-engineering student at the University of Virginia. The project won first place in the national iDISPLA University Adversarial AI/ML Challenge.
+
+### 2021–2022 — Prototype Development
+
+After the initial competition proposal, implementation work expanded as aforementioned.
+
+## Recognition & Media
+
+### University of Virginia
+
+* [UVA Engineering — UVA Undergrads Offer New Approach to Detecting Deepfakes](https://engineering.virginia.edu/news-events/news/uva-undergrads-offer-new-approach-detecting-deepfakes)
+* [UVA Today — UVA Undergrads Offer New Approach to Detecting 'Deepfake' Videos](https://news.virginia.edu/content/uva-undergrads-offer-new-approach-detecting-deepfake-videos)
+
+### Radio
+
+* [WVTF / Radio IQ — Fact or Fiction: Two UVA Students Tackle Deepfakes](https://www.wvtf.org/news/2021-06-18/fact-or-fiction-two-uva-students-tackle-deepfakes)
+
+### TV Appearance
+
+* [29News / WVIR — UVA students working on deepfake detection technology](https://www.29news.com/2021/06/16/uva-students-working-deepfake-detection-technology/)
+
+### Investigative Coverage
+
+* [InvestigateTV — Swapped Out: Hackers target social media users with high-tech fake videos](https://www.investigatetv.com/2022/05/16/swapped-out-hackers-target-social-media-users-with-high-tech-fake-videos/)
+
+## Status
+
+This repository should be treated as a research and engineering prototype.
+
+It is useful for exploring decentralized media provenance, perceptual hashing, distributed verification, blockchain-style ledgers, and peer-to-peer networking. It is not production-ready deepfake-detection or cybersecurity software and should not be relied upon as an authoritative media-authentication service.
+
+## Authors & Acknowledgments
+
+The original competition concept was developed by Ahmed Hussain and Zachary Yahn at the University of Virginia with the support of Prof. Mircea Stan and Dr. Samiran Ganguly. Subsequent implementation work involved additional significant contributions from Samuel Buxbaum and additional contributors; see this repository's commit history for individual contributions.
+
+## License
+
+This repository is released under the **GNU General Public License v3.0**.
+
+See [`LICENSE.md`](LICENSE.md) for details.
