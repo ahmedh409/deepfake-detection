@@ -1,6 +1,7 @@
 # Peregrine Deepfake Detection
 
 As seen on:
+
 UVA students working on deepfake detection technology
 https://www.29news.com/2021/06/16/uva-students-working-deepfake-detection-technology/
 
