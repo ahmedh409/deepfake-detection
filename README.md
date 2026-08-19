@@ -1,4 +1,15 @@
-# Deepfake Detection
+# Peregrine Deepfake Detection
+
+As seen on:
+UVA students working on deepfake detection technology
+https://www.29news.com/2021/06/16/uva-students-working-deepfake-detection-technology/
+
+Swapped Out: Hackers target social media users with high-tech fake videos
+https://www.wbko.com/2022/05/16/swapped-out-hackers-target-social-media-users-with-high-tech-fake-videos/
+
+UVA Undergrads Offer New Approach to Detecting ‘Deepfake’ Videos
+https://news.virginia.edu/content/uva-undergrads-offer-new-approach-detecting-deepfake-videos
+
 
 #### October 1st, 2022
 - updated test suite with 2 tests for Ahmed to fill in
